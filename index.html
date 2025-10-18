@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dibuja en la Página</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 2px solid #000;
+      margin-top: 20px;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    #controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>te explicare-solo e una simple pagina de dibujos :)</h1>
+
+  <canvas id="canvas" width="600" height="400"></canvas>
+
+  <div id="controls">
+    <label for="color">Color:</label>
+    <input type="color" id="color" value="#000000">
+
+    <label for="size">Tamaño:</label>
+    <input type="range" id="size" min="1" max="20" value="3">
+
+    <button onclick="clearCanvas()">Borrar Todo</button>
+    <button onclick="downloadCanvas()">Descargar</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('color');
+    const sizePicker = document.getElementById('size');
+
+    let painting = false;
+
+    function startPosition(e) {
+      painting = true;
+      draw(e);
+    }
+
+    function endPosition() {
+      painting = false;
+      ctx.beginPath();
+    }
+
+    function draw(e) {
+      if (!painting) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches[0].clientX) - rect.left;
+      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+      ctx.lineWidth = sizePicker.value;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = colorPicker.value;
+
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+
+    // Eventos de mouse
+    canvas.addEventListener('mousedown', startPosition);
+    canvas.addEventListener('mouseup', endPosition);
+    canvas.addEventListener('mousemove', draw);
+
+    // Eventos táctiles (móviles/tabletas)
+    canvas.addEventListener('touchstart', startPosition);
+    canvas.addEventListener('touchend', endPosition);
+    canvas.addEventListener('touchmove', draw);
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function downloadCanvas() {
+      const link = document.createElement('a');
+      link.download = 'mi_dibujo.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
